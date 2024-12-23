@@ -1,0 +1,66 @@
+plugins {
+    id 'java'
+    id 'io.qameta.allure' version '2.11.0'
+}
+
+group = 'org.example'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testImplementation 'io.rest-assured:rest-assured:5.0.0'
+    testImplementation 'io.qameta.allure:allure-junit5:2.13.9'
+}
+
+test {
+    useJUnitPlatform()
+    finalizedBy 'allureReport' 
+    testLogging {
+        events "passed", "skipped", "failed"
+    }
+    systemProperty "allure.results.directory", "$buildDir/allure-results" 
+    outputs.dir file("$buildDir/allure-results")
+}
+
+allure {
+    version = '2.11.0' 
+    autoconfigure = true 
+}
+
+tasks.withType(Test).configureEach {
+    useJUnitPlatform()
+    outputs.dir file("$buildDir/allure-results")
+}
+
+task testRegisterUser(type: Test) {
+    useJUnitPlatform {
+        includeTags 'registerUser'
+    }
+}
+
+task testUpdateUser(type: Test) {
+    useJUnitPlatform {
+        includeTags 'updateUser'
+    }
+}
+
+task testDeleteUser(type: Test) {
+    useJUnitPlatform {
+        includeTags 'deleteUser'
+    }
+}
+
+task testGetUser(type: Test) {
+    useJUnitPlatform {
+        includeTags 'getUser'
+    }
+}
+
+task testAll(type: Test) {
+    dependsOn testRegisterUser, testUpdateUser, testDeleteUser, testGetUser
+}
